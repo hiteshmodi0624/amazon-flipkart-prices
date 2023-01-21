@@ -4,7 +4,6 @@ import json
 from PyQt5.QtWebEngineWidgets import QWebEnginePage
 from PyQt5.QtWidgets import QApplication
 from PyQt5.QtCore import QUrl
-import regex as rg
 
 url = json.loads(sys.stdin.read())
 class Page(QWebEnginePage):
@@ -48,3 +47,5 @@ def job():
   
 # main code
 job()
+
+

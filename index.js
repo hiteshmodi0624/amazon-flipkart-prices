@@ -6,31 +6,37 @@ var price='0';
 app.get("/",function(req,res){
     const { spawn } = require('child_process');
     var amazonPrice=0,flipkartPrice=0;
-    console.log("inside get");
-    var urla=req.query.amazon
-    var urlf=req.query.flipkart
-    const amazon=spawn('python', ['public/amazon.py'])
-    amazon.stdin.write(JSON.stringify(urla));
-    amazon.stdin.end();
-    amazon.stdout.on('data', function(data) {
-        amazonPrice=data.toString();
-        amazonPrice=amazonPrice.replace(',','');
-        amazonPrice=parseFloat(amazonPrice);
-        if(amazonPrice>flipkartPrice)
-            price=flipkartPrice;
-        else
-            price=amazonPrice;
-        res.send(JSON.stringify(price));
-    });
-    const flipkart=spawn('python', ['public/flipkart.py']);
-    flipkart.stdin.write(JSON.stringify(urlf));
-    flipkart.stdin.end();
-    flipkart.stdout.on('data', function(data) {
-        flipkartPrice=data.toString();
-        flipkartPrice=flipkartPrice.replace(',','');
-        flipkartPrice=parseFloat(flipkartPrice);
-    });
-    
+    if(req.query.length==0)
+        res.send('0');
+    if(req.query.hasOwnProperty('amazon')){
+        var urla=req.query.amazon
+        console.log(urla)
+        const amazon=spawn('python', ['public/amazon.py'])
+        amazon.stdin.write(JSON.stringify(urla));
+        amazon.stdin.end();
+        amazon.stdout.on('data', function(data) {
+            amazonPrice=data.toString();
+            amazonPrice=amazonPrice.replace(',','');
+            amazonPrice=parseFloat(amazonPrice);
+            if(amazonPrice>flipkartPrice)
+                price=flipkartPrice;
+            else
+                price=amazonPrice;
+            res.send(JSON.stringify(price));
+        });
+    }
+    if(req.query.hasOwnProperty('flipkart')){
+        var urlf=req.query.flipkart
+        console.log(urlf)
+        const flipkart=spawn('python', ['public/flipkart.py']);
+        flipkart.stdin.write(JSON.stringify(urlf));
+        flipkart.stdin.end();
+        flipkart.stdout.on('data', function(data) {
+            flipkartPrice=data.toString();
+            flipkartPrice=flipkartPrice.replace(',','');
+            flipkartPrice=parseFloat(flipkartPrice);
+        });
+    }
 })
 app.post("/",function(req,res){
     res.redirect("?amazon="+req.body.amazon+"&&flipkart="+req.body.flipkart)
