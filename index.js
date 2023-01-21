@@ -1,50 +1,32 @@
 const express = require("express");
-const bodyParser = require("body-parser");
 const app = express();
-app.use(bodyParser.urlencoded({extended: true}));
-var price='0';
+var Xray = require('x-ray')
+var xray = Xray()
 app.get("/",function(req,res){
-    const { spawn } = require('child_process');
-    var amazonPrice=0,flipkartPrice=0;
-    var x=true
-    if(req.query.hasOwnProperty('amazon')){
-        x=false
-        var urla=req.query.amazon
-        console.log(urla)
-        const amazon=spawn('python', ['public/amazon.py'])
-        amazon.stdin.write(JSON.stringify(urla));
-        amazon.stdin.end();
-        amazon.stdout.on('data', function(data) {
-            amazonPrice=data.toString();
-            amazonPrice=amazonPrice.replace(',','');
-            amazonPrice=parseFloat(amazonPrice);
-            console.log(amazonPrice)
-            if(flipkartPrice==0)
-                res.send(JSON.stringify(amazonPrice));
-            if(amazonPrice>flipkartPrice)
-                price=flipkartPrice;
-            else
-                price=amazonPrice;
-            res.send(JSON.stringify(price));
-        });
+    var aprice=0,fprice=0;
+    if(req.query.hasOwnProperty('amazon')&&req.query.hasOwnProperty('flipkart')){
+        xray(req.query.amazon, '.a-price-whole')(function(err,resp){
+            aprice=parseInt(resp.replace('.','').replace(',',''))
+            xray(req.query.flipkart, '._16Jk6d')(function(err,resp){
+                fprice=parseInt(resp.substring(1).replace(',',''))
+                res.send(JSON.stringify(Math.min(fprice,aprice)))
+            })
+        })
     }
-    if(req.query.hasOwnProperty('flipkart')){
-        x=false
-        var urlf=req.query.flipkart
-        console.log(urlf)
-        const flipkart=spawn('python', ['public/flipkart.py']);
-        flipkart.stdin.write(JSON.stringify(urlf));
-        flipkart.stdin.end();
-        flipkart.stdout.on('data', function(data) {
-            flipkartPrice=data.toString();
-            flipkartPrice=flipkartPrice.replace(',','');
-            flipkartPrice=parseFloat(flipkartPrice);
-            console.log(flipkartPrice)
-            res.send(JSON.stringify(flipkartPrice));
-        });
+    else if(req.query.hasOwnProperty('amazon')){
+        xray(req.query.amazon, '.a-price-whole')(function(err,resp){
+            aprice=parseInt(resp.replace('.','').replace(',',''))
+            res.send(JSON.stringify(aprice))
+        })
     }
-    if(x)
-        res.send('0');
+    else if(req.query.hasOwnProperty('flipkart')){
+        xray(req.query.flipkart, '._16Jk6d')(function(err,resp){
+            fprice=parseInt(resp.substring(1).replace(',',''))
+            res.send(JSON.stringify(fprice))
+        })
+    }
+    else
+        res.send(JSON.stringify(null));
 })
 app.post("/",function(req,res){
     res.redirect("?amazon="+req.body.amazon+"&&flipkart="+req.body.flipkart)
