@@ -6,9 +6,9 @@ var price='0';
 app.get("/",function(req,res){
     const { spawn } = require('child_process');
     var amazonPrice=0,flipkartPrice=0;
-    if(req.query.length==0)
-        res.send('0');
+    var x=true
     if(req.query.hasOwnProperty('amazon')){
+        x=false
         var urla=req.query.amazon
         console.log(urla)
         const amazon=spawn('python', ['public/amazon.py'])
@@ -26,6 +26,7 @@ app.get("/",function(req,res){
         });
     }
     if(req.query.hasOwnProperty('flipkart')){
+        x=false
         var urlf=req.query.flipkart
         console.log(urlf)
         const flipkart=spawn('python', ['public/flipkart.py']);
@@ -37,6 +38,8 @@ app.get("/",function(req,res){
             flipkartPrice=parseFloat(flipkartPrice);
         });
     }
+    if(x)
+        res.send('0')
 })
 app.post("/",function(req,res){
     res.redirect("?amazon="+req.body.amazon+"&&flipkart="+req.body.flipkart)
