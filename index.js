@@ -26,13 +26,10 @@ app.get("/",function(req,res){
         })
     }
     else
-        res.send(JSON.stringify(null));
+        res.sendFile(__dirname+"/index.html");
 })
 app.post("/",function(req,res){
     res.redirect("?amazon="+req.body.amazon+"&&flipkart="+req.body.flipkart)
-})
-app.get("/checkprices",function(req,res){
-    res.sendFile(__dirname+"/index.html");
 })
 app.listen(3000, function() {
     console.log("Server started on port 3000");
