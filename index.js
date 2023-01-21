@@ -18,6 +18,9 @@ app.get("/",function(req,res){
             amazonPrice=data.toString();
             amazonPrice=amazonPrice.replace(',','');
             amazonPrice=parseFloat(amazonPrice);
+            console.log(amazonPrice)
+            if(flipkartPrice==0)
+                res.send(JSON.stringify(amazonPrice));
             if(amazonPrice>flipkartPrice)
                 price=flipkartPrice;
             else
@@ -36,10 +39,12 @@ app.get("/",function(req,res){
             flipkartPrice=data.toString();
             flipkartPrice=flipkartPrice.replace(',','');
             flipkartPrice=parseFloat(flipkartPrice);
+            console.log(flipkartPrice)
+            res.send(JSON.stringify(flipkartPrice));
         });
     }
     if(x)
-        res.send('0')
+        res.send('0');
 })
 app.post("/",function(req,res){
     res.redirect("?amazon="+req.body.amazon+"&&flipkart="+req.body.flipkart)
