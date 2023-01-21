@@ -6,6 +6,7 @@ var price='0';
 app.get("/",function(req,res){
     const { spawn } = require('child_process');
     var amazonPrice=0,flipkartPrice=0;
+    console.log("inside get");
     var urla=req.query.amazon
     var urlf=req.query.flipkart
     const amazon=spawn('python', ['public/amazon.py'])
