@@ -1,0 +1,1 @@
+json.loads(sys.stdin.read())
